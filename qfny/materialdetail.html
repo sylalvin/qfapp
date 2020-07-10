@@ -1,0 +1,271 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+		<link href="css/mui.imageviewer.css" rel="stylesheet" />
+		<style type="text/css">
+			.mui-bar-nav {
+				background-color: #04B1E9;
+			}
+
+			.mui-bar-nav a,
+			.mui-bar-nav h1 {
+				color: #fff;
+			}
+
+			.mui--z1 {
+				box-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24)
+			}
+
+			.mui-input-row span {
+				font-family: 'Helvetica Neue', Helvetica, sans-serif;
+				line-height: 1.1;
+				float: left;
+				width: 65%;
+				padding: 11px 15px;
+				color: #0062CC;
+			}
+
+			form textarea {
+				font-family: 'Helvetica Neue', Helvetica, sans-serif;
+				line-height: 1.1;
+				float: left;
+				width: 100%;
+				padding: 11px 15px;
+				color: #0062CC;
+			}
+
+			.mui-content>.mui-card:first-child {
+				margin-top: 1px;
+			}
+
+			.mui-card {
+				margin: 1px;
+				border-radius: 5px;
+			}
+
+			#number {
+				font-size: 16px;
+				color: #6d6d72;
+			}
+
+			hr {
+				border: .5px dashed #ccc;
+			}
+
+			.e_img {
+				margin: 10px 0px;
+			}
+
+			/*toast信息提示*/
+			.mui-toast-container {
+				bottom: 50% !important;
+			}
+
+			.mui-toast-message {
+				font-size: 1.5rem;
+				opacity: 0.6;
+				color: #fff;
+				width: auto;
+				padding: 20px 20px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title"></h1>
+		</div>
+		<div class="mui-content">
+			<div class="mui-card">
+				<div class="mui-card-header">
+					<span id="name"></span>
+					<span id="number"></span>
+				</div>
+				<div class="mui-card-footer">
+					<span id="user_name"></span>
+					<span id="receive_date"></span>
+				</div>
+			</div>
+			<div class="mui-content-padded" style="margin: 5px;">
+				<div class="mui-input-row">
+					<label>所属站点：</label>
+					<span id="station_name"></span>
+				</div>
+				<hr>
+				<div class="mui-input-row">
+					<label>原料种类：</label>
+					<span id="material_type"></span>
+				</div>
+				<hr>
+				<div class="mui-input-row">
+					<label>移走车辆压力：</label>
+					<span id="move_pressure"></span>
+				</div>
+				<hr>
+				<div class="mui-input-row">
+					<label>车头牌号：</label>
+					<span id="car_header"></span>
+				</div>
+				<hr>
+				<div class="mui-input-row">
+					<label>车体牌号：</label>
+					<span id="car_body"></span>
+				</div>
+				<hr>
+				<div class="mui-input-row">
+					<label>TT车容积：</label>
+					<span id="volume"></span>
+				</div>
+				<hr>
+				<div class="mui-input-row">
+					<label>原料接收温度：</label>
+					<span id="temperature"></span>
+				</div>
+				<hr>
+				<div class="mui-input-row">
+					<label>原料接收压力：</label>
+					<span id="pressure"></span>
+				</div>
+				<hr>
+				<div class="mui-row" style="margin: 15px;">
+					<div class="mui-col-sm-6 mui-col-xs-6">
+						<label>加氢站人员签字：</label>
+						<img id="hydrogenerator_signature" class="e_img mui--z1" width="90%" />
+					</div>
+					<div class="mui-col-sm-6 mui-col-xs-6">
+						<label>送货员签字：</label>
+						<img id="deliveryman_signature" class="e_img mui--z1" width="90%" />
+					</div>
+				</div>
+				<hr>
+				<div class="mui-input-row">
+					<label>相关文件记录：</label>
+				</div>
+				<div id="related_documents" class="mui-row" style="margin: 15px;">
+					<!-- <div class="mui-col-sm-6 mui-col-xs-6">
+						<img class="e_img mui--z1" width="90%"/>
+					</div> -->
+				</div>
+			</div>
+		</div>
+		<!-- <div id="outerdiv" style="text-align: center;position: fixed;z-index: 1000;top: 0;left: 0;width: 100%;height: 100%;background-color: rgba(255,255,255,.9);">
+			<img id="bigimg" style="height: auto;width: 100%;border: 0;margin: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;"
+			 src="" />
+		</div> -->
+		<!-- 系统 -->
+		<script src="js/mui.js"></script>
+		<script src="js/mui.imageViewer.js"></script>
+		<script src="js/jquery.min.js" type="text/javascript"></script>
+		<script>
+			mui.init();
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				var materialid = self.materialid;
+				mui.ajax('http://www.hyfuncloud.cn/api/MaterialRecord/queryContentById', {
+					data: {
+						materialid: materialid
+					},
+					dataType: 'json', //服务器返回json格式数据
+					type: 'post', //HTTP请求类型
+					timeout: 10000, //超时时间设置为10秒；
+					success: function(result) {
+						if (result.data != '') {
+							var material_type = '';
+							switch (result.data[0].materialType) {
+								case '1':
+									material_type = '氢气';
+									break;
+								case '2':
+									material_type = '氮气';
+									break;
+								case '3':
+									material_type = '氩气';
+									break;
+								case '4':
+									material_type = '氦气';
+									break;
+								case '5':
+									material_type = '其他';
+									break;
+							}
+							$('.mui-title').html(result.data[0].name);
+							$('#number').html(result.data[0].number);
+							$('#name').html(result.data[0].name);
+							$('#user_name').html(result.data[0].userName);
+							$('#receive_date').html(result.data[0].receiveDate);
+							$('#station_name').html(result.data[0].stationName);
+							$('#material_type').html(material_type);
+							$('#volume').html(result.data[0].volume + ' Nm³');
+							$('#temperature').html(result.data[0].temperature + ' ℃');
+							$('#pressure').html(result.data[0].pressure + ' Bar');
+							$('#move_pressure').html(result.data[0].movePressure + ' Bar');
+							$('#car_header').html(result.data[0].carHeader);
+							$('#car_body').html(result.data[0].carBody);
+							var hydrogeneratorSignatureImg = "http://www.hyfuncloud.cn" + result.data[0].hydrogeneratorSignature;
+							var deliverymanSignatureImg = "http://www.hyfuncloud.cn" + result.data[0].deliverymanSignature;
+							$('#hydrogenerator_signature').attr({
+								src: hydrogeneratorSignatureImg
+							});
+							$('#deliveryman_signature').attr({
+								src: deliverymanSignatureImg
+							});
+							// related_documents
+							var related_str = ''
+							if (result.data[0].relatedDocuments != null) {
+								for (let i = 0; i < result.data[0].relatedDocuments.length; i++) {
+									related_str += '<div class="mui-col-sm-6 mui-col-xs-6">' +
+										'<img class="e_img mui--z1" width="90%" src="http://www.hyfuncloud.cn' + result.data[0].relatedDocuments[
+											i] + '"/>' +
+										'</div>';
+								}
+							} else {
+								related_str = '暂无相关文件！'
+							}
+							$('#related_documents').html(related_str);
+						} else {
+							mui.toast('未找到该原料接收单', {
+								duration: 'short',
+								type: 'div'
+							});
+						}
+					},
+					error: function(xhr) {
+						mui.toast('网络请求出现错误', {
+							duration: 'short',
+							type: 'div'
+						});
+					}
+				})
+				mui('.mui-content').on('tap', 'img', function() {
+					var imageViewer = new mui.ImageViewer('img', {
+						dbl: false
+					});
+				})
+			});
+		</script>
+		<!-- <script type="text/javascript">
+			//图片放大  
+			$("#outerdiv").hide();
+			mui('.mui-content').on('tap', 'img', function() {
+				var _this = $(this);
+				imgShow("#outerdiv", "#bigimg", _this);
+			})
+			function imgShow(outerdiv, bigimg, _this) {
+				var src = _this.attr("src"); //获取当前点击的pimg元素中的src属性    
+				$("#outerdiv").attr('display', 'block');
+				$("#bigimg").attr("src", src); //设置#bigimg元素的src属性    
+				$("#outerdiv").fadeIn("fast");
+
+				$("#outerdiv").click(function() { //再次点击淡出消失弹出层    
+					$(this).fadeOut("fast");
+				});
+			}
+		</script> -->
+	</body>
+</html>

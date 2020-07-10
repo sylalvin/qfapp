@@ -1,0 +1,221 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+		<link href="css/mui.imageviewer.css" rel="stylesheet" />
+		<style type="text/css">
+			.mui-bar-nav {
+				background-color: #04B1E9;
+			}
+
+			.mui-bar-nav a,
+			.mui-bar-nav h1 {
+				color: #fff;
+			}
+
+			.mui--z1 {
+				box-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24)
+			}
+
+			.mui--z2 {
+				box-shadow: 0 3px 6px rgba(0, 0, 0, .16), 0 3px 6px rgba(0, 0, 0, .23)
+			}
+
+			.mui--z3 {
+				box-shadow: 0 10px 20px rgba(0, 0, 0, .19), 0 6px 6px rgba(0, 0, 0, .23)
+			}
+
+			.mui--z4 {
+				box-shadow: 0 14px 28px rgba(0, 0, 0, .25), 0 10px 10px rgba(0, 0, 0, .22)
+			}
+
+			.mui--z5 {
+				box-shadow: 0 19px 38px rgba(0, 0, 0, .3), 0 15px 12px rgba(0, 0, 0, .22);
+			}
+
+			.mui-input-row span {
+				font-family: 'Helvetica Neue', Helvetica, sans-serif;
+				line-height: 1.1;
+				float: left;
+				width: 65%;
+				padding: 11px 15px;
+				color: #0062CC;
+			}
+
+			form textarea {
+				font-family: 'Helvetica Neue', Helvetica, sans-serif;
+				line-height: 1.1;
+				float: left;
+				width: 100%;
+				padding: 11px 15px;
+				color: #0062CC;
+			}
+
+			.e_img {
+				float: left;
+				margin: 0px 15px 10px;
+			}
+			
+			/*toast信息提示*/
+			.mui-toast-container {
+				bottom: 50% !important;
+			}
+
+			.mui-toast-message {
+				font-size: 1.5rem;
+				opacity: 0.6;
+				color: #fff;
+				width: auto;
+				padding: 20px 20px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title"></h1>
+		</div>
+		<div class="mui-content">
+			<div class="mui-content-padded" style="margin: 5px;">
+				<div class="mui-input-row">
+					<label>编号：</label>
+					<span id="number" style="vertical-align: middle;"></span>
+				</div>
+				<div class="mui-input-row">
+					<label>名称：</label>
+					<span id="title"></span>
+				</div>
+				<div class="mui-input-row">
+					<label>站点名称：</label>
+					<span id="stationName"></span>
+				</div>
+				<div class="mui-input-row">
+					<label>故障种类：</label>
+					<span id="typeName"></span>
+				</div>
+				<div class="mui-input-row">
+					<label>负责人员：</label>
+					<span id="responsible"></span>
+				</div>
+				<div class="mui-input-row">
+					<label>支持人员：</label>
+					<span id="support"></span>
+				</div>
+				<div class="mui-input-row">
+					<label>开始时间：</label>
+					<span id="startTime"></span>
+				</div>
+				<div class="mui-input-row">
+					<label>严重程度：</label>
+					<span id="level"></span>
+				</div>
+				<div class="mui-input-row">
+					<label>完成时间：</label>
+					<span id="doneTime"></span>
+				</div>
+				<div class="mui-input-row">
+					<label>进度描述：</label>
+					<span id="progress"></span>
+				</div>
+				<div class="mui-input-row">
+					<label>问题描述：</label>
+				</div>
+				<textarea id="description"></textarea>
+				<div class="mui-input-row">
+					<label>处理方案：</label>
+				</div>
+				<textarea id="way"></textarea>
+				<div class="mui-input-row">
+					<label>故障原因分析：</label>
+				</div>
+				<textarea id="reason"></textarea>
+				<div class="mui-input-row">
+					<label>备注：</label>
+				</div>
+				<textarea id="note"></textarea>
+				<div class="mui-input-row">
+					<label>附件：</label>
+				</div>
+				<img id="enclosure" class="e_img mui--z1" style="max-width: 200px;" />
+			</div>
+		</div>
+		<!-- 系统 -->
+		<script src="js/mui.js"></script>
+		<script src="js/mui.imageViewer.js"></script>
+		<script src="js/jquery.min.js" type="text/javascript"></script>
+		<script>
+			mui.init();
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				var faultid = self.faultid;
+				mui.ajax('http://www.hyfuncloud.cn/api/fault/queryContentById', {
+					data: {
+						faultid: faultid
+					},
+					dataType: 'json', //服务器返回json格式数据
+					type: 'post', //HTTP请求类型
+					timeout: 10000, //超时时间设置为10秒；
+					success: function(result) {
+						if (result.data != '') {
+							var level = '';
+							if (result.data[0].level == 'P1') {
+								level = 'P1（非常严重，需要在24小时完成）';
+							}
+							if (result.data[0].level == 'P2') {
+								level = 'P2（严重，一周完成）';
+							}
+							if (result.data[0].level == 'P3') {
+								level = 'P3（一般，一个月内完成）';
+							}
+							if (result.data[0].level == 'P4') {
+								level = 'P4（轻微，6个月内完成）';
+							}
+							var str = JSON.stringify(result.data[0]);
+							$('.mui-title').html(result.data[0].title);
+							$('#number').html(result.data[0].number);
+							$('#title').html(result.data[0].title);
+							$('#stationName').html(result.data[0].stationName);
+							$('#typeName').html(result.data[0].typeName);
+							$('#responsible').html(result.data[0].responsible);
+							$('#support').html(result.data[0].support);
+							$('#startTime').html(result.data[0].startTime);
+							$('#level').html(level);
+							$('#doneTime').html(result.data[0].doneTime);
+							$('#progress').html(result.data[0].progress);
+							$('#description').html(result.data[0].description);
+							var imgsrc = "http://www.hyfuncloud.cn" + result.data[0].enclosure;
+							$('#enclosure').attr({
+								src: imgsrc
+							});
+							$('#way').html(result.data[0].way);
+							$('#reason').html(result.data[0].reason);
+							$('#note').html(result.data[0].note);
+							$('#createdAt').html(result.data[0].createdAt);
+						} else {
+							mui.toast('未找到该故障单', {
+									duration: 'short',
+									type: 'div'
+								});
+						}
+					},
+					error: function(xhr) {
+						mui.toast('网络请求出现错误', {
+									duration: 'short',
+									type: 'div'
+								});
+					}
+				})
+				mui('.mui-content').on('tap', 'img', function() {
+					var imageViewer = new mui.ImageViewer('img', {
+						dbl: false
+					});
+				})
+			});
+		</script>
+	</body>
+</html>

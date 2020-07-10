@@ -1,0 +1,171 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+		<style type="text/css">
+			html {
+				background-color: #fff;
+			}
+
+			.mui-bar-nav {
+				background: #04B1E9;
+			}
+
+			.mui-bar-nav a,
+			.mui-bar-nav h1 {
+				color: #fff;
+			}
+			
+			.mui-bar .mui-title {
+				right: 120px;
+				left: 120px;
+			}
+
+			.mui-table-view:after,
+			.mui-table-view-cell:after {
+				height: 0;
+			}
+
+			/*toast信息提示*/
+			.mui-toast-container {
+				bottom: 50% !important;
+			}
+
+			.mui-toast-message {
+				font-size: 1.5rem;
+				opacity: 0.6;
+				color: #fff;
+				width: auto;
+				padding: 20px 20px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">巡检管理</h1>
+			<span id="inspection_records" style="padding: 0px 10px;color:#ccc;float:right;line-height: 45px;">巡检记录</span>
+		</header>
+		<div class="mui-content">
+			<ul class="mui-table-view" id="List" style="margin-top: 0px;">
+			</ul>
+		</div>
+		<script src="js/mui.js"></script>
+		<script src="js/jquery.min.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			mui.init({
+				beforeback: function() {
+					var page = plus.webview.currentWebview().opener();
+					mui.fire(page, 'rhome', {});
+					return true;
+				}
+			});
+			mui.plusReady(function() {
+				window.addEventListener('reflash', function(e) {
+					console.log("re");
+					location.reload();
+				});
+				var year = new Date().getFullYear();
+				var month = new Date().getMonth() + 1;
+				if (month < 10) {
+					month = '0' + month;
+				}
+				var day = new Date().getDate();
+				if (day < 10) {
+					day = '0' + day;
+				}
+				var date = year + '-' + month + '-' + day;
+				mui.ajax('http://www.hyfuncloud.cn/api/inspect/get', {
+					data: {
+						user_id: plus.storage.getItem('userId'),
+						date: date
+					},
+					dataType: 'json', //服务器返回json格式数据
+					type: 'post', //HTTP请求类型
+					timeout: 10000, //超时时间设置为10秒；
+					success: function(result) {
+						if (result) {
+							var str = '';
+							if (result.data.length > 0) {
+								for (var i = 0; i < result.data.length; i++) {
+									for (var j = 0; j < result.data[i].timeSlot.length; j++) {
+										var flag = 0;
+										mui.ajax('http://www.hyfuncloud.cn/api/inspect/getResult', {
+											data: {
+												inspect_id: result.data[i].id,
+												current_date: date,
+												current_time: result.data[i].timeSlot[j]
+											},
+											dataType: "json",
+											type: 'post',
+											async: false,
+											timeout: 10000,
+											success: function(res) {
+												if (res.data == 0) {
+													flag = 1;
+												}
+											},
+											error: function(xhr, type, errorThrown) {
+												mui.toast('错误', {
+													duration: 'short',
+													type: 'div'
+												});
+											}
+										});
+										if (flag == 1) {
+											str += '<li class="mui-table-view-cell" id="' + result.data[i].id + '_' + j + '">' +
+												'	<a class="mui-navigate-right">' +
+												'		<div style="border: #999 solid 1px;padding: 5px;border-radius: 0.25rem;background-color: #fffeee;">' +
+												'			<h4>' + result.data[i].regionName + '</h4>' +
+												'			<p style="color: red; font-size: 1rem;margin-top: 5px;">' + result.data[i].timeSlot[j] + '</p>' +
+												'			<p style="width: 95%;margin-top: 5px;white-space:normal;word-wrap: break-word;word-break: break-all;">' +
+												result.data[i].content + '</p>' +
+												'		</div>' +
+												'	</a>' +
+												'</li>';
+										}
+									}
+								}
+							}
+							if (str == '') {
+								str += '<div class="mui-row mui-text-center">' +
+									'	<img style="margin-top: 8rem;" src="images/notask.png">' +
+									'</div>';
+							}
+							$('#List').html(str);
+							mui('.mui-table-view').on('tap', '.mui-table-view-cell', function(event) {
+								var inspect = $(this).attr("id");
+								var inspectid = inspect.split("_")[0];
+								var time_slot = $(this).find('a').find('div').find('p:first').text();
+								mui.openWindow({
+									url: 'inscontent.html',
+									id: 'inscontent.html',
+									extras: {
+										inspectid: inspectid,
+										time_slot: time_slot,
+										date: date
+									}
+								});
+							});
+						}
+					},
+					error: function(xhr) {}
+				});
+				var inspection_records = document.getElementById("inspection_records");
+				inspection_records.addEventListener('tap', function() {
+					mui.openWindow({
+						url: 'insrecords.html',
+						id: 'insrecords.html',
+						extras: {}
+					});
+				})
+			})
+		</script>
+	</body>
+
+</html>

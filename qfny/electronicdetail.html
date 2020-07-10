@@ -1,0 +1,196 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+		<style type="text/css">
+			.mui-bar-nav {
+				background-color: #04B1E9;
+			}
+
+			.mui-bar-nav a,
+			.mui-bar-nav h1 {
+				color: #fff;
+			}
+
+			.mui-input-row span {
+				font-family: 'Helvetica Neue', Helvetica, sans-serif;
+				line-height: 1.1;
+				float: left;
+				width: 65%;
+				padding: 11px 15px;
+				color: #0062CC;
+			}
+
+			form textarea {
+				font-family: 'Helvetica Neue', Helvetica, sans-serif;
+				line-height: 1.1;
+				float: left;
+				width: 100%;
+				padding: 11px 15px;
+				color: #0062CC;
+			}
+			
+			.mui-content > .mui-card:first-child {
+				margin-top: 1px;
+			}
+			
+			.mui-card{
+				margin: 1px;
+				border-radius: 5px;
+			}
+			
+			#number{
+				font-size: 16px;
+				color: #6d6d72;
+			}
+			
+			hr {
+				border: .5px dashed #ccc;
+			}
+			
+			/*toast信息提示*/
+			.mui-toast-container {
+				bottom: 50% !important;
+			}
+
+			.mui-toast-message {
+				font-size: 1.5rem;
+				opacity: 0.6;
+				color: #fff;
+				width: auto;
+				padding: 20px 20px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title"></h1>
+		</div>
+		<div class="mui-content">
+			<div class="mui-card">
+				<div class="mui-card-header">
+					<span id="name"></span>
+					<span id="number"></span>
+				</div>
+				<div class="mui-card-footer">
+					<span id="user_name"></span>
+					<span id="recording_time"></span>
+				</div>
+			</div>
+			<div class="mui-content-padded" style="margin: 5px;">
+				<div class="mui-input-row">
+					<label>所属站点：</label>
+					<span id="station_name"></span>
+				</div>
+				<hr>
+				<div class="mui-input-row">
+					<label>事项类别：</label>
+					<span id="item_category"></span>
+				</div>
+				<hr>
+				<div class="mui-input-row">
+					<label>设备类型：</label>
+					<span id="equipment_type"></span>
+				</div>
+				<hr>
+				<div class="mui-input-row">
+					<label>等级：</label>
+					<span id="grade"></span>
+				</div>
+				<hr>
+				<div class="mui-input-row">
+					<label>情况描述：</label>
+				</div>
+				<textarea id="desc"></textarea>
+			</div>
+		</div>
+		<!-- 系统 -->
+		<script src="js/mui.js"></script>
+		<script src="js/jquery.min.js" type="text/javascript"></script>
+		<script>
+			mui.init();
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				var electronicid = self.electronicid;
+				mui.ajax('http://www.hyfuncloud.cn/api/ElectronicRecord/queryContentById', {
+					data: {
+						electronicid: electronicid
+					},
+					dataType: 'json', //服务器返回json格式数据
+					type: 'post', //HTTP请求类型
+					timeout: 10000, //超时时间设置为10秒；
+					success: function(result) {
+						if (result.data != '') {
+							var item_category = '';
+							var equipment_type = '';
+							switch (result.data[0].itemCategory){
+								case '1':
+									item_category = '日常记录';
+									break;
+								case '2':
+									item_category = '交接班记录';
+									break;
+								case '3':
+									item_category = '设备故障';
+									break;
+								case '4':
+									item_category = '加氢站启动/停止';
+									break;
+								case '5':
+									item_category = '事件报告';
+									break;
+								case '6':
+									item_category = '通知';
+									break;
+							}
+							switch (result.data[0].equipmentType){
+								case '1':
+									equipment_type = '机械';
+									break;
+								case '2':
+									equipment_type = '仪控';
+									break;
+								case '3':
+									equipment_type = '电气';
+									break;
+								case '4':
+									equipment_type = '安全';
+									break;
+								default:
+									equipment_type = '其他';
+									break;
+							}
+							$('.mui-title').html(result.data[0].name);
+							$('#number').html(result.data[0].number);
+							$('#name').html(result.data[0].name);
+							$('#station_name').html(result.data[0].stationName);
+							$('#item_category').html(item_category);
+							$('#equipment_type').html(equipment_type);
+							$('#recording_time').html(result.data[0].recordingTime);
+							$('#user_name').html(result.data[0].userName);
+							$('#grade').html(result.data[0].grade);
+							$('#desc').html(result.data[0].desc);
+						} else {
+							mui.toast('未找到该电子记录单', {
+									duration: 'short',
+									type: 'div'
+								});
+						}
+					},
+					error: function(xhr) {
+						mui.toast('网络请求出现错误', {
+									duration: 'short',
+									type: 'div'
+								});
+					}
+				})
+			});
+		</script>
+	</body>
+</html>

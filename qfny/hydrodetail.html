@@ -1,0 +1,258 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+		<style type="text/css">
+			.mui-bar-nav {
+				background-color: #04B1E9;
+			}
+
+			.mui-bar-nav a,
+			.mui-bar-nav h1 {
+				color: #fff;
+			}
+
+			.mui--z1 {
+				box-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24)
+			}
+			
+			.mui-input-row{
+				width: 100%;
+			}
+
+			.mui-input-row label {
+				font-family: 'Helvetica Neue', Helvetica, sans-serif;
+				font-size: 1rem;
+				line-height: 1.1;
+				float: left;
+				width: 35%;
+				padding: 11px 15px;
+				color: #000;
+			}
+			
+			.mui-input-row span {
+				font-family: 'Helvetica Neue', Helvetica, sans-serif;
+				font-size: 1rem;
+				line-height: 1.1;
+				float: left;
+				width: 65%;
+				padding: 11px 15px;
+				color: #0062CC;
+			}
+			
+			.mui-content > .mui-card:first-child {
+				margin-top: 1px;
+			}
+			
+			.mui-card{
+				margin: 5px 0;
+				border-radius: 5px;
+			}
+			
+			.font1{
+				font-size: .8rem;
+				color: #666;
+			}
+			
+			#number{
+				font-size: 16px;
+				color: #6d6d72;
+			}
+			
+			hr {
+				border: .5px dashed #ccc;
+			}
+
+			.e_img {
+				margin: 10px 0px;
+			}
+			
+			/*toast信息提示*/
+			.mui-toast-container {
+				bottom: 50% !important;
+			}
+
+			.mui-toast-message {
+				font-size: 1.5rem;
+				opacity: 0.6;
+				color: #fff;
+				width: auto;
+				padding: 20px 20px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title"></h1>
+		</div>
+		<div class="mui-content">
+			<div class="mui-card">
+				<div class="mui-card-header">
+					<span id="name"></span>
+					<span id="number"></span>
+				</div>
+				<div class="mui-card-footer">
+					<span id="user_name"></span>
+					<span id="created_at"></span>
+				</div>
+			</div>
+			<div class="mui-card">
+				<div class="mui-card-header">
+					<span class="font1">基本信息：</span>
+				</div>
+				<div class="mui-card-body">
+					<div class="mui-input-row">
+						<label>所属站点：</label>
+						<span id="station_name"></span>
+					</div>
+					<div class="mui-input-row">
+						<label>车牌号码：</label>
+						<span id="car_no"></span>
+					</div>
+				</div>
+			</div>
+			<div class="mui-card">
+				<div class="mui-card-header">
+					<span class="font1">加氢前车辆参数信息：</span>
+				</div>
+				<div class="mui-card-body">
+					<div class="mui-input-row">
+						<label>开始加氢时间：</label>
+						<span id="begin_time"></span>
+					</div>
+					<div class="mui-input-row">
+						<label>起始压力：</label>
+						<span id="starting_pressure"></span>
+					</div>
+					<div class="mui-input-row">
+						<label>起始温度：</label>
+						<span id="starting_temperature"></span>
+					</div>
+					<div class="mui-input-row">
+						<label>起始氢气量：</label>
+						<span id="starting_hydrogen"></span>
+					</div>
+				</div>
+			</div>
+			<div class="mui-card">
+				<div class="mui-card-header">
+					<span class="font1">加氢后车辆参数信息：</span>
+				</div>
+				<div class="mui-card-body">
+					<div class="mui-input-row">
+						<label>结束加氢时间：</label>
+						<span id="end_time"></span>
+					</div>
+					<div class="mui-input-row">
+						<label>结束压力：</label>
+						<span id="end_pressure"></span>
+					</div>
+					<div class="mui-input-row">
+						<label>结束温度：</label>
+						<span id="end_temperature"></span>
+					</div>
+					<div class="mui-input-row">
+						<label>结束氢气量：</label>
+						<span id="end_hydrogen"></span>
+					</div>
+				</div>
+			</div>
+			<div class="mui-card">
+				<div class="mui-card-header">
+					<span class="font1">加氢信息统计：</span>
+				</div>
+				<div class="mui-card-body">
+					<div class="mui-input-row">
+						<label>加氢时间历经：</label>
+						<span id="spend_time"></span>
+					</div>
+					<div class="mui-input-row">
+						<label>本次加氢量：</label>
+						<span id="total_hydrogen"></span>
+					</div>
+				</div>
+			</div>
+			<div class="mui-card">
+				<div class="mui-card-header">
+					<span class="font1">签名留存：</span>
+				</div>
+				<div class="mui-card-body">
+					<div class="mui-row" style="margin: 15px;">
+						<div class="mui-col-sm-6 mui-col-xs-6">
+							<label>加氢员签名：</label>
+							<img id="hydrogenerator_signature" class="e_img mui--z1" width="90%"/>
+						</div>
+						<div class="mui-col-sm-6 mui-col-xs-6">
+							<label>司机签名：</label>
+							<img id="deliveryman_signature" class="e_img mui--z1" width="90%"/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- 系统 -->
+		<script src="js/mui.js"></script>
+		<script src="js/jquery.min.js" type="text/javascript"></script>
+		<script>
+			mui.init();
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				var hydroid = self.hydroid;
+				mui.ajax('http://www.hyfuncloud.cn/api/HydrogenationRecord/queryContentById', {
+					data: {
+						hydroid: hydroid
+					},
+					dataType: 'json', //服务器返回json格式数据
+					type: 'post', //HTTP请求类型
+					timeout: 10000, //超时时间设置为10秒；
+					success: function(result) {
+						if (result.data != '') {
+							$('.mui-title').html(result.data[0].name);
+							$('#number').html(result.data[0].number);
+							$('#name').html(result.data[0].name);
+							$('#user_name').html(result.data[0].userName);
+							$('#created_at').html(result.data[0].createdAt);
+							$('#station_name').html(result.data[0].stationName);
+							$('#car_no').html(result.data[0].carNo);
+							$('#begin_time').html(result.data[0].beginTime);
+							$('#starting_pressure').html(result.data[0].startingPressure + ' Bar');
+							$('#starting_temperature').html(result.data[0].startingTemperature + ' ℃');
+							$('#starting_hydrogen').html(result.data[0].startingHydrogen + ' %');
+							$('#end_time').html(result.data[0].endTime);
+							$('#end_pressure').html(result.data[0].endPressure + ' Bar');
+							$('#end_temperature').html(result.data[0].endTemperature + ' ℃');
+							$('#end_hydrogen').html(result.data[0].endHydrogen + ' %');
+							$('#spend_time').html(result.data[0].spendTime);
+							$('#total_hydrogen').html(result.data[0].totalHydrogen + ' kg');
+							var hydrogeneratorSignatureImg = "http://www.hyfuncloud.cn" + result.data[0].hydrogeneratorSignature;
+							var deliverymanSignatureImg = "http://www.hyfuncloud.cn" + result.data[0].driverSignature;
+							$('#hydrogenerator_signature').attr({
+								src: hydrogeneratorSignatureImg
+							});
+							$('#deliveryman_signature').attr({
+								src: deliverymanSignatureImg
+							});
+						} else {
+							mui.toast('未找到该加氢单', {
+									duration: 'short',
+									type: 'div'
+								});
+						}
+					},
+					error: function(xhr) {
+						mui.toast('网络请求出现错误', {
+									duration: 'short',
+									type: 'div'
+								});
+					}
+				})
+			});
+		</script>
+	</body>
+</html>

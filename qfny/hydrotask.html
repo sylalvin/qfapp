@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+		<style type="text/css">
+			.mui-bar-nav {
+				background: #04B1E9;
+			}
+
+			.mui-bar-nav a,
+			.mui-bar-nav h1 {
+				color: #fff;
+			}
+			
+			.mui-bar .mui-title {
+				right: 120px;
+				left: 120px;
+			}
+
+			/*toast信息提示*/
+			.mui-toast-container {
+				bottom: 50% !important;
+			}
+
+			.mui-toast-message {
+				font-size: 1.5rem;
+				opacity: 0.6;
+				color: #fff;
+				width: auto;
+				padding: 20px 20px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title"></h1>
+			<span id="create_task" style="padding: 0px 10px;color:#ccc;float:right;line-height: 45px;">创建新任务</span>
+		</header>
+		<div class="mui-content mui-scroll-wrapper">
+			<div class="mui-scroll"> 
+				<ul class="mui-table-view" id="List" style="margin-top: 0px;margin-bottom: 100px;">
+				</ul>
+			</div>
+		</div>
+		<script src="js/mui.js"></script>
+		<script src="js/jquery.min.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			mui.init();
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				var stationId = self.stationId;
+				var stationName = self.stationName;
+				var page_url = 'hydrogen.html';
+				if ((stationId == 12) || (stationId == 13)) {
+					page_url = 'hydrogen_zz.html';
+				} else {
+					page_url = 'hydrogen.html';
+				}
+				$('.mui-title').html(stationName + '-任务列表');
+				mui('.mui-scroll-wrapper').scroll({
+					startY: 0, //初始化时滚动至y
+					indicators: true, //是否显示滚动条
+					deceleration:0.0006, //阻尼系数,系数越小滑动越灵敏
+					bounce: true //是否启用回弹
+				});
+				window.addEventListener('reflash', function(e) {
+					location.reload();
+				});
+				mui.ajax('http://www.hyfuncloud.cn/api/HydrogenationRecord/queryTaskList', {
+					data: {
+						stationId: stationId,
+						userId: plus.storage.getItem("userId")
+					},
+					dataType: 'json', //服务器返回json格式数据
+					type: 'post', //HTTP请求类型
+					timeout: 10000, //超时时间设置为10秒；
+					success: function(result) {
+						var str = '';
+						if (result != null) {
+							for (var i = 0; i < result.data.length; i++) {
+								str += '<li class="mui-table-view-cell" id="' + result.data[i].id + '">' +
+									'<a class="mui-navigate-right">' + result.data[i].carNo + '&nbsp;&nbsp;>>>&nbsp;&nbsp;' + result.data[i].createdAt + 
+									'</a>' +
+									'</li>';
+							}
+							$('#List').html(str);
+							mui('#List').on('tap', '.mui-table-view-cell', function(event) {
+								var taskId = this.getAttribute('id');
+								var taskName = $(this).text();
+								mui.openWindow({
+									url: page_url,
+									id: page_url,
+									extras: {
+										stationId: stationId,
+										stationName: stationName,
+										taskId: taskId,
+										taskName: taskName,
+										flag: 2
+									}
+								});
+							});
+						} else {
+							mui.toast('任务不存在', {
+								duration: 'short',
+								type: 'div'
+							});
+						}
+					},
+					error: function(xhr) {
+
+					}
+				});
+				var create_task = document.getElementById("create_task");
+				create_task.addEventListener('tap', function() {
+					mui.openWindow({
+						url: page_url,
+						id: page_url,
+						extras: {
+							stationId: stationId,
+							stationName: stationName,
+							flag: 1
+						}
+					});
+				})
+			})
+		</script>
+	</body>
+
+</html>

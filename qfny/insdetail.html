@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<title></title>
+
+		<link href="css/mui.min.css" rel="stylesheet" type="text/css" />
+		<link href="css/mui.imageviewer.css" rel="stylesheet" />
+		<style>
+			.mui-input-group:after{
+				height:0;
+			}
+			.mui-input-group:before{
+				height:0;
+			}
+			.mui-checkbox input[type=checkbox], .mui-radio input[type=radio]{
+				position: static;
+			}
+			.mui-checkbox label, .mui-radio label{
+				width:20%;
+				padding:0;
+				height: 26px;
+				line-height: 26px;
+			}
+			.mui-input-group .mui-input-row:after{
+				background-color:transparent;
+			}
+			.mui-navigate-right{
+				border-bottom:1px solid #e6e6e6;
+			}
+			html {
+				background-color: #fff;
+			}
+		
+			.mui-bar-nav {
+				background: #04B1E9;
+			}
+		
+			.mui-bar-nav a,
+			.mui-bar-nav h1 {
+				color: #fff;
+			}
+			
+			.mui-content{
+				background-color: #fff;
+			}
+		
+			.mui-table-view:after,
+			.mui-table-view-cell:after {
+				height: 0;
+			}
+			#NoRlist{
+				background-color: #fff;
+			}
+			li{
+				/* list-style: square inside url('/i/eg_arrow.gif') */
+				list-style: none;
+			}
+			
+			.e_img {
+				margin: 0px 0px 10px;
+			}
+			
+			.mui--z1 {
+				box-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24)
+			}
+    </style>
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">巡检内容</h1>
+		</header>
+		<div class="mui-content" style="margin-top: 0;" id="List">
+		</div>
+		<script src="js/mui.min.js" type="text/javascript"></script>
+		<script src="js/mui.imageViewer.js"></script>
+		<script src="js/jquery.min.js" type="text/javascript"></script>
+		<script>
+			mui.init();
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				var inspect_result_id = self.inspect_result_id;
+				var str = '';
+				mui.ajax('http://www.hyfuncloud.cn/api/inspect/getDetailById', {
+					data: {
+						inspect_result_id: inspect_result_id
+					},
+					dataType: 'json', //服务器返回json格式数据
+					type: 'post', //HTTP请求类型
+					timeout: 10000, //超时时间设置为10秒；
+					success: function(result) {
+						if (result.data != "") {
+							$('.mui-title').html(result.data[0].content);
+							var status = '正常';
+							var enclosure = '';
+							var sig = '';
+							if (result.data[0].result == 1) {
+								status = '异常';
+							}
+							if (result.data[0].enclosure != null) {
+								for (let i = 0; i < result.data[0].enclosure.length; i++) {
+									enclosure += '<div class="mui-col-sm-6 mui-col-xs-6">' +
+										'<img class="e_img mui--z1" width="90%" src="http://www.hyfuncloud.cn' + result.data[0].enclosure[i] + '"/>' +
+										'</div>';
+								}
+							} else {
+								enclosure = '暂无相关文件！';
+							}
+							if (result.data[0].sig != '') {
+								sig = '<img width="100%" src="http://www.hyfuncloud.cn' + result.data[0].sig + '" alt="">';
+							}
+							str = '<div class="mui-row"><div class="mui-col-sm-12 mui-col-xs-12"><li class="mui-table-view-cell">巡检站点：' +
+								result.data[0].stationName +
+								'</li></div></div>' +
+								'<div class="mui-row"><div class="mui-col-sm-12 mui-col-xs-12"><li class="mui-table-view-cell">巡检区域：' +
+								result.data[0].regionName +
+								'</li></div></div>' +
+								'<div class="mui-row"><div class="mui-col-sm-12 mui-col-xs-12"><li class="mui-table-view-cell">是否正常：' +
+								status +
+								'</li></div></div>' +
+								'<div class="mui-row"><div class="mui-col-sm-12 mui-col-xs-12"><li class="mui-table-view-cell">备注信息：' +
+								result.data[0].text +
+								'</li></div></div>' +
+								'<div class="mui-row"><div class="mui-col-sm-12 mui-col-xs-12"><li class="mui-table-view-cell">填写参数：' +
+								result.data[0].parm +
+								'</li></div></div>' +
+								'<div class="mui-row"><div class="mui-col-sm-12 mui-col-xs-12"><li class="mui-table-view-cell">巡检日期：' +
+								result.data[0].inspectDate +
+								'</li></div></div>' +
+								'<div class="mui-row"><div class="mui-col-sm-12 mui-col-xs-12"><li class="mui-table-view-cell">巡检时间段：' +
+								result.data[0].inspectTime +
+								'</li></div></div>' +
+								'<div class="mui-row"><li class="mui-table-view-cell">相关图片：</li></div>' +
+								'<div id="related_documents" class="mui-row" style="margin: 15px;">' + enclosure + '</div>' +
+								'<div class="mui-row"><div class="mui-col-sm-12 mui-col-xs-12"><li class="mui-table-view-cell">完成时间：' +
+								result.data[0].createdAt +
+								'</li></div></div>' +
+								'<div class="mui-row"><div class="mui-col-sm-8 mui-col-xs-8"><li class="mui-table-view-cell">巡检员签名：' +
+								sig +
+								'</li></div></div>';
+							$('#List').html(str);
+						}
+					},
+					error: function(xhr, type, errorThrown) {}
+				});
+				mui('.mui-content').on('tap', 'img', function() {
+					var imageViewer = new mui.ImageViewer('img', {
+						dbl: false
+					});
+				})
+			})
+		</script>
+	</body>
+</html>

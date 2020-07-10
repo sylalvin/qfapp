@@ -1,0 +1,204 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="css/mui.min.css">
+		<link rel="stylesheet" href="css/mui.picker.css">
+		<link rel="stylesheet" href="css/mui.poppicker.css">
+		<link rel="stylesheet" href="css/mui.dtpicker.css">
+		<style type="text/css">
+			.mui-bar-nav {
+				background-color: #04B1E9;
+			}
+
+			.mui-bar-nav a,
+			.mui-bar-nav h1 {
+				color: #fff;
+			}
+
+			* {
+				touch-action: none;
+			}
+
+			/*toast信息提示*/
+			.mui-toast-container {
+				bottom: 50% !important;
+			}
+
+			.mui-toast-message {
+				font-size: 1.5rem;
+				opacity: 0.6;
+				color: #fff;
+				width: auto;
+				padding: 20px 20px;
+			}
+		</style>
+
+	</head>
+	<body>
+		<div class="mui-bar mui-bar-nav"><a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title"></h1>
+		</div>
+		<div class="mui-content mui-scroll-wrapper">
+			<div class="mui-input-row" style="padding: 10px 5px;z-index: 9999;background-color: #eee;">
+				<input style="width: 30%;margin-bottom: 0px;" placeholder="1969-01-01" id="start_date" type="text" placeholder="开始日期" />
+				-
+				<input style="width: 30%;margin-bottom: 0px;" placeholder="1969-01-01" id="end_date" type="text" placeholder="结束日期" />
+				<span id="search" class="mui-btn mui-btn-outlined mui-btn-blue" style="font-size: 1rem;">搜&nbsp;&nbsp;索</span>
+			</div>
+			<div class="mui-scroll"> 
+				<ul class="mui-table-view" id="List" style="margin-top: 0px;margin-bottom: 100px;">
+				</ul>
+			</div>
+		</div>
+		<script src="js/mui.js"></script>
+		<script src="js/mui.picker.js"></script>
+		<script src="js/mui.poppicker.js"></script>
+		<script src="js/mui.dtpicker.js"></script>
+		<script src="js/jquery.min.js" type="text/javascript"></script>
+		<script>
+			mui.init();
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				var title = self.title;
+				var stationId = self.stationId;
+				var stationName = self.stationName;
+				$('.mui-title').html(stationName + '-' + title);
+				$("#start_date").val(getSomeDay(-1));
+				$("#end_date").val(getSomeDay(1));
+				mui('.mui-scroll-wrapper').scroll({
+					startY: 0, //初始化时滚动至y
+					indicators: true, //是否显示滚动条
+					deceleration:0.0006, //阻尼系数,系数越小滑动越灵敏
+					bounce: true //是否启用回弹
+				});
+				var startDate = '';
+				var endDate = '';
+				getDate();
+				getList();
+				//开始时间
+				var Date1 = new mui.DtPicker({
+					type: 'date'
+				});
+				var startTime = document.getElementById("start_date");
+				startTime.addEventListener('tap', function() {
+					Date1.show(function(item) {
+						startTime.value = item.toString();
+					})
+				});
+				//结束时间
+				var Date2 = new mui.DtPicker({
+					type: 'date'
+				});
+				var endTime = document.getElementById("end_date");
+				endTime.addEventListener('tap', function() {
+					Date2.show(function(item) {
+						endTime.value = item.toString();
+					})
+				});
+
+				function getDate() {
+					let start_date = $("#start_date").val();
+					let end_date = $("#end_date").val();
+					if (judgeDate(start_date, end_date)) {
+						startDate = start_date;
+						endDate = end_date;
+						return true;
+					}
+					return false;
+				}
+				
+				// 获取日期
+				function getSomeDay(times) {
+					var myDate = new Date();
+					myDate.setTime(myDate.getTime() + times*24*60*60*1000);
+					var year = myDate.getFullYear();
+					var month = myDate.getMonth() + 1;
+					var date = myDate.getDate();
+					var someDay = year + '-' + getCorrect(month) + "-" + getCorrect(date);
+					return someDay;
+				}
+				
+				// 判断时间
+				function getCorrect(number) {
+					return number < 10 ? '0' + number : number;
+				}
+
+				function judgeDate(start_date, end_date) {
+					if (start_date > end_date) {
+						mui.alert('开始日期不能大于结束日期', ' ', '知道了', function(e) {}, 'div');
+						return false;
+					} else if (start_date == '' || end_date == '') {
+						mui.alert('开始和结束日期不能为空', ' ', '知道了', function(e) {}, 'div');
+						return false;
+					} else {
+						return true;
+					}
+				}
+				document.getElementById('search').addEventListener('tap', function() {
+					if (getDate()) {
+						getList();
+					}
+				})
+
+				function getList() {
+					mui.ajax('http://www.hyfuncloud.cn/api/MaterialRecord/queryListByUserId', {
+						data: {
+							stationId: stationId,
+							userId: plus.storage.getItem("userId"),
+							startDate: startDate,
+							endDate: endDate
+						},
+						dataType: 'json', //服务器返回json格式数据
+						type: 'post', //HTTP请求类型
+						timeout: 10000, //超时时间设置为10秒；
+						success: function(result) {
+							var str = '';
+							if (result.data != '') {
+								for (var i = 0; i < result.data.length; i++) {
+									str += '<li class="mui-table-view-cell" id="' + result.data[i].id + '">' +
+										'<a class="mui-navigate-right">' + result.data[i].name + '&nbsp;-&nbsp' + result.data[i].receiveDate + '&nbsp;-&nbsp' + result.data[i].pressure + '&nbsp;Bar' +
+										'</a>' +
+										'</li>';
+								}
+								$('#List').html(str);
+								mui.toast('检索已完成', {
+									duration: 'short',
+									type: 'div'
+								});
+								mui('#List').on('tap', '.mui-table-view-cell', function(event) {
+									var materialid = this.getAttribute('id');
+									mui.openWindow({
+										url: 'materialdetail.html',
+										id: 'materialdetail.html',
+										extras: {
+											materialid: materialid
+										}
+									});
+								});
+							} else {
+								str = '<li class="mui-table-view-cell">暂无数据</li>';
+								$('#List').html(str);
+								mui.toast('检索已完成', {
+									duration: 'short',
+									type: 'div'
+								});
+							}
+						},
+						error: function(xhr) {
+							mui.toast('网络请求出现错误', {
+								duration: 'short',
+								type: 'div'
+							});
+						}
+					});
+				}
+			});
+		</script>
+	</body>
+</html>

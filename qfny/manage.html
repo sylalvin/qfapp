@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+		<style type="text/css">
+			/*toast信息提示*/
+			.mui-toast-container {
+				bottom: 50% !important;
+			}
+			
+			.mui-toast-message {
+				font-size: 1.5rem;
+				opacity: 0.6;
+				color: #fff;
+				width: auto;
+				padding: 20px 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="mui-content">
+			<ul class="mui-table-view" style="margin-top: 0px;">
+				<li id="inspection" class="mui-table-view-cell mui-media">
+					<a href="javascript:;" class="mui-navigate-right">
+						<img class="mui-media-object mui-pull-left" src="images/inspect.png">
+						<div class="mui-media-body">
+							巡检管理
+							<p class="mui-ellipsis">站内巡检流程化</p>
+						</div>
+					</a>
+				</li>
+				<li id="fault" class="mui-table-view-cell mui-media">
+					<a href="javascript:;" class="mui-navigate-right">
+						<img class="mui-media-object mui-pull-left" src="images/fault.png">
+						<div class="mui-media-body">
+							故障管理
+							<p class="mui-ellipsis">站内异常故障填写单</p>
+						</div>
+					</a>
+				</li>
+				<li id="operation" class="mui-table-view-cell mui-media">
+					<a href="javascript:;" class="mui-navigate-right">
+						<img class="mui-media-object mui-pull-left" src="images/work.png">
+						<div class="mui-media-body">
+							作业管理
+							<p class="mui-ellipsis">站内用于作业人员作业指导</p>
+						</div>
+					</a>
+				</li>
+				<li id="elect" class="mui-table-view-cell mui-media">
+					<a href="javascript:;" class="mui-navigate-right">
+						<img class="mui-media-object mui-pull-left" src="images/elect.png">
+						<div class="mui-media-body">
+							电子记录
+							<p class="mui-ellipsis">站员用来做交接班、设备故障、其他的相关记录</p>
+						</div>
+					</a>
+				</li>
+				<li id="hydro" class="mui-table-view-cell mui-media">
+					<a href="javascript:;" class="mui-navigate-right">
+						<img class="mui-media-object mui-pull-left" src="images/hydro.png">
+						<div class="mui-media-body">
+							加氢记录
+							<p class="mui-ellipsis">对加氢站加氢实现电子记录的功能，便于人员操作与追溯</p>
+						</div>
+					</a>
+				</li>
+				<li id="mater" class="mui-table-view-cell mui-media">
+					<a href="javascript:;" class="mui-navigate-right">
+						<img class="mui-media-object mui-pull-left" src="images/mater.png">
+						<div class="mui-media-body">
+							原料接收记录
+							<p class="mui-ellipsis">站内用于对原料的接收状态和质量的追溯</p>
+						</div>
+					</a>
+				</li>
+			</ul>
+		</div>
+		<script src="js/mui.js"></script>
+		<script src="js/jquery.min.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			mui.init()
+			mui('.mui-table-view').on('tap', '.mui-table-view-cell', function(event) {
+				var itemId = this.getAttribute('id');
+				var params = [];
+				getNextUrl(itemId);
+				function getNextUrl(itemId) {
+					let nextUrl = '';
+					let moudleId;
+					let moudleName = '';
+					switch (itemId) {
+						case 'inspection':
+							nextUrl = 'inspection.html';
+							moudleId = 0;
+							moudleName = '巡检管理';
+							params.push(nextUrl, moudleId, moudleName);
+							break;
+						case 'fault':
+							nextUrl = 'stationlist.html';
+							moudleId = 5;
+							moudleName = '故障管理';
+							params.push(nextUrl, moudleId, moudleName);
+							break;
+						case 'operation':
+							nextUrl = 'stationlist.html';
+							moudleId = 1;
+							moudleName = '作业管理';
+							params.push(nextUrl, moudleId, moudleName);
+							break;
+						case 'elect':
+							nextUrl = 'stationlist.html';
+							moudleId = 8;
+							moudleName = '电子记录';
+							params.push(nextUrl, moudleId, moudleName);
+							break;
+						case 'hydro':
+							nextUrl = 'stationlist.html';
+							moudleId = 9;
+							moudleName = '加氢记录';
+							params.push(nextUrl, moudleId, moudleName);
+							break;
+						case 'mater':
+							nextUrl = 'stationlist.html';
+							moudleId = 10;
+							moudleName = '原料接收记录';
+							params.push(nextUrl, moudleId, moudleName);
+					}
+					return params;
+				}
+				if (params) {
+					mui.openWindow({
+						url: params[0],
+						id: params[0],
+						extras: {
+							moudleId: params[1],
+							moudleName: params[2]
+						}
+					});
+				}
+			});
+			var first = null;
+			mui.back = function() {
+				mui.plusReady(function() {
+					//首页返回键处理
+					//处理逻辑：1秒内，连续两次按返回键，则退出应用；
+					if (!first) {
+						first = new Date().getTime();
+						mui.toast('再按一次退出应用', {
+							duration: 'short',
+							type: 'div'
+						});
+						setTimeout(function() {
+							first = null;
+						}, 1000);
+					} else {
+						if (new Date().getTime() - first < 1000) {
+							plus.runtime.quit();
+						}
+					}
+				});
+			}
+		</script>
+	</body>
+
+</html>

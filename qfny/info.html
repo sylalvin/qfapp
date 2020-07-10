@@ -1,0 +1,194 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+		<style type="text/css">
+			.pb-1 {
+				padding-bottom: 0.5rem;
+			}
+
+			.mt-1 {
+				margin-top: 0.5rem;
+			}
+			
+			/*toast信息提示*/
+			.mui-toast-container {
+				bottom: 50% !important;
+			}
+			
+			.mui-toast-message {
+				font-size: 1.5rem;
+				opacity: 0.6;
+				color: #fff;
+				width: auto;
+				padding: 20px 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="mui-content">
+			<ul class="mui-table-view mui-grid-view" style="margin-top: 0px;background-color: aliceblue;">
+				<li class="mui-table-view-cell mui-media mui-col-xs-4" style="padding: 20px;">
+					<img class="mui-media-object" src="./images/user.png">
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-8 mui-text-left">
+					<h4 class="pb-1" id="username"></h4>
+					<p class="pb-1" id="email"></p>
+					<p class="pb-1" id="phone"></p>
+					<p class="pb-1" id="address"></p>
+				</li>
+			</ul>
+			<ul class="mui-table-view mt-1">
+				<li id="myFault" class="mui-table-view-cell">
+					<a class="mui-navigate-right">
+						<span class="mui-icon mui-icon-minus"></span>&nbsp;&nbsp;我的故障单
+					</a>
+				</li>
+				<li id="myWork" class="mui-table-view-cell">
+					<a class="mui-navigate-right">
+						<span class="mui-icon mui-icon-compose"></span>&nbsp;&nbsp;我的作业记录
+					</a>
+				</li>
+				<li id="myElect" class="mui-table-view-cell">
+					<a class="mui-navigate-right">
+						<span class="mui-icon mui-icon-videocam"></span>&nbsp;&nbsp;电子记录
+					</a>
+				</li>
+				<li id="myHydro" class="mui-table-view-cell">
+					<a class="mui-navigate-right">
+						<span class="mui-icon mui-icon-plus"></span>&nbsp;&nbsp;我的加氢记录
+					</a>
+				</li>
+				<li id="myMater" class="mui-table-view-cell">
+					<a class="mui-navigate-right">
+						<span class="mui-icon mui-icon-flag"></span>&nbsp;&nbsp;我的原料接收记录
+					</a>
+				</li>
+				<li id="about" class="mui-table-view-cell">
+					<a class="mui-navigate-right">
+						<span class="mui-icon mui-icon-navigate"></span>&nbsp;&nbsp;关于我们
+					</a>
+				</li>
+			</ul>
+			<ul class="mui-table-view mt-1">
+				<button id="logout" type="button" class="mui-btn mui-btn-white mui-btn-block" style="border: none; color: red;">退&nbsp;出&nbsp;登&nbsp;录</button>
+			</ul>
+		</div>
+		<script src="js/mui.js"></script>
+		<script src="js/jquery.min.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			mui.init();
+			mui.plusReady(function () {
+				getInfo();
+				setInterval(function() {
+					getInfo();
+				}, 500);
+				function getInfo() {
+					var username = plus.storage.getItem("username");
+					var email = plus.storage.getItem("email");
+					var phone = plus.storage.getItem("phone");
+					var address = plus.storage.getItem("address");
+					$("#username").html(username);
+					$("#email").html('<span>邮箱：</span>' + email);
+					$("#phone").html('<span>手机：</span>' + phone);
+					$("#address").html('<span>地址：</span>' + address);
+				}
+			    document.getElementById('myFault').addEventListener('tap', function() {
+			    	mui.openWindow({
+			    		url: 'myfaultstation.html',
+			    		id: 'myfaultstation.html',
+			    		extras: {
+			    			
+			    		}
+			    	});
+			    })
+			    document.getElementById('myWork').addEventListener('tap', function() {
+			    	mui.openWindow({
+			    		url: 'myworkstation.html',
+			    		id: 'myworkstation.html',
+			    		extras: {
+			    			
+			    		}
+			    	});
+			    })
+			    document.getElementById('myElect').addEventListener('tap', function() {
+			    	mui.openWindow({
+			    		url: 'myelectronic.html',
+			    		id: 'myelectronic.html',
+			    		extras: {
+			    			
+			    		}
+			    	});
+			    })
+			    document.getElementById('myHydro').addEventListener('tap', function() {
+			    	mui.openWindow({
+			    		url: 'myhydrostation.html',
+			    		id: 'myhydrostation.html',
+			    		extras: {
+			    			
+			    		}
+			    	});
+			    })
+			    document.getElementById('myMater').addEventListener('tap', function() {
+			    	mui.openWindow({
+			    		url: 'mymaterialstation.html',
+			    		id: 'mymaterialstation.html',
+			    		extras: {
+			    			
+			    		}
+			    	});
+			    })
+			    document.getElementById('about').addEventListener('tap', function() {
+			    	mui.openWindow({
+			    		url: 'about.html',
+			    		id: 'about.html'
+			    	});
+			    })
+				document.getElementById('logout').addEventListener('tap', function() {
+					// 获取已预设的数据
+					var hlists = plus.storage.getItem("hlists");
+					var flists = plus.storage.getItem("flists");
+					var slists = plus.storage.getItem("slists");
+					var clists = plus.storage.getItem("clists");
+					
+					// 清除所有本地缓存数据
+					plus.storage.clear();
+					
+					// 存储已预设的数据
+					plus.storage.setItem('hlists', hlists);
+					plus.storage.setItem('flists', flists);
+					plus.storage.setItem('slists', slists);
+					plus.storage.setItem('clists', clists);
+					
+					plus.runtime.quit();
+				})
+			})
+			var first = null;
+			mui.back = function() {
+				mui.plusReady(function() {
+					//首页返回键处理
+					//处理逻辑：1秒内，连续两次按返回键，则退出应用；
+					if (!first) {
+						first = new Date().getTime();
+						mui.toast('再按一次退出应用', {
+							duration: 'short',
+							type: 'div'
+						});
+						setTimeout(function() {
+							first = null;
+						}, 1000);
+					} else {
+						if (new Date().getTime() - first < 1000) {
+							plus.runtime.quit();
+						}
+					}
+				});
+			}
+		</script>
+	</body>
+
+</html>

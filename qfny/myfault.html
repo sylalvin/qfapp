@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+		<style type="text/css">
+			.mui-bar-nav {
+				background-color: #04B1E9;
+			}
+
+			.mui-bar-nav a,
+			.mui-bar-nav h1 {
+				color: #fff;
+			}
+
+			/*toast信息提示*/
+			.mui-toast-container {
+				bottom: 50% !important;
+			}
+
+			.mui-toast-message {
+				font-size: 1.5rem;
+				opacity: 0.6;
+				color: #fff;
+				width: auto;
+				padding: 20px 20px;
+			}
+		</style>
+
+	</head>
+	<body>
+		<div class="mui-bar mui-bar-nav"><a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title"></h1>
+		</div>
+		<div class="mui-content">
+			<ul class="mui-table-view" id="List" style="margin-top: 0px;">
+			</ul>
+		</div>
+		<script src="js/mui.js"></script>
+		<script src="js/jquery.min.js" type="text/javascript"></script>
+		<script>
+			mui.init();
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				var title = self.title;
+				var stationId = self.stationId;
+				$('.mui-title').html(title);
+				mui.ajax('http://www.hyfuncloud.cn/api/fault/queryListByUserId', {
+					data: {
+						stationid: stationId,
+						userid: plus.storage.getItem('userId')
+					},
+					dataType: 'json', //服务器返回json格式数据
+					type: 'post', //HTTP请求类型
+					timeout: 10000, //超时时间设置为10秒；
+					success: function(result) {
+						if (result.data != '') {
+							var str = '';
+							for (var i = 0; i < result.data.length; i++) {
+								str += '<li class="mui-table-view-cell" id="' + result.data[i].id + '">' +
+									'<a class="mui-navigate-right">' + result.data[i].title +
+									'</a>' +
+									'</li>';
+							}
+							$('#List').html(str);
+							mui('#List').on('tap', '.mui-table-view-cell', function(event) {
+								var faultid = this.getAttribute('id');
+								mui.openWindow({
+									url: 'faultdetail.html',
+									id: 'faultdetail.html',
+									extras: {
+										faultid: faultid
+									}
+								});
+							});
+						}
+					},
+					error: function(xhr) {
+						mui.toast('网络请求出现错误', {
+							duration: 'short',
+							type: 'div'
+						});
+					}
+				})
+
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,855 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="css/mui.min.css">
+		<link rel="stylesheet" href="css/iconfont.css">
+		<link rel="stylesheet" href="css/mui.picker.css">
+		<link rel="stylesheet" href="css/mui.poppicker.css">
+		<link rel="stylesheet" href="css/mui.dtpicker.css">
+		<style type="text/css">
+			.mui-bar-nav {
+				background: #04B1E9;
+			}
+
+			.mui-bar-nav a,
+			.mui-bar-nav h1 {
+				color: #fff;
+			}
+
+			.ui-alert {
+				text-align: center;
+				padding: 20px 10px;
+				font-size: 16px;
+			}
+
+			.icon-rili {
+				float: right;
+				width: 15%;
+				line-height: 1.1;
+				padding: 7px 10px 7px 0px;
+				color: #007aff;
+			}
+
+			.icon-renwu {
+				float: left;
+				line-height: 1.1;
+				padding: 7px 10px 7px 0px;
+				color: #007aff;
+			}
+
+			.icon-fujian {
+				float: left;
+				line-height: 1.1;
+				padding: 7px 10px 7px 0px;
+				color: #007aff;
+			}
+
+			#popover {
+				height: 100px;
+				width: 200px;
+			}
+
+			.mui-badge1 {
+				padding: 0px;
+				width: 65%;
+				float: right;
+				line-height: 42px;
+				font-size: 14px;
+			}
+
+			.text_unit {
+				float: right;
+				width: 15%;
+				line-height: 1.1;
+				padding: 12px 10px 7px 0px;
+				color: red;
+			}
+
+			.mui-card {
+				margin: 0px;
+			}
+
+			.mui-card-content {
+				padding: 10px 15px;
+			}
+
+			.notice_text {
+				color: #dd524d;
+			}
+
+			hr {
+				border: .5px dashed #ccc;
+			}
+
+			.mui-switch:before {
+				content: '开始';
+				color: #999;
+			}
+
+			.mui-switch.mui-active:before {
+				content: '结束';
+				color: #fff;
+			}
+
+			.mui--z1 {
+				box-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24)
+			}
+
+			.mui--z2 {
+				box-shadow: 0 3px 6px rgba(0, 0, 0, .16), 0 3px 6px rgba(0, 0, 0, .23)
+			}
+
+			.e_img {
+				margin: 10px 0px;
+			}
+
+			/*toast信息提示*/
+			.mui-toast-container {
+				bottom: 50% !important;
+			}
+
+			.mui-toast-message {
+				font-size: 1.5rem;
+				opacity: 0.6;
+				color: #fff;
+				width: auto;
+				padding: 20px 20px;
+			}
+
+			#checkSwitch:before {
+				content: '异常';
+			}
+
+			#checkSwitch.mui-active:before {
+				content: '正常';
+			}
+			
+			#read_temperature {
+				text-align: center;
+				margin-left: 1.25rem;
+				border: solid 1px #ccc;
+				border-radius: 5%;
+				padding: 7px 10px 5px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">开始加氢</h1>
+		</header>
+		<div class="mui-content">
+			<div id="echars" style="width: 80%;height:100px;"></div>
+			<div id="saveData" class="mui--z1" style="width: 90px;height: 90px;color: red;position: fixed;top: 50px;right: 20px;z-index:999;background-color: seagreen;border-radius: 50%;padding: 37px 10px;opacity: .8;">
+				保存数据
+			</div>
+			<div class="mui-content-padded" style="margin: 5px;">
+				<form id="form" class="mui-input-group" enctype="multipart/form-data">
+					<div class="mui-input-row">
+						<label>编号：</label>
+						<input id="number" type="text" placeholder="系统自动生成编号" readonly="readonly">
+					</div>
+					<div class="mui-input-row">
+						<label>站点名称：</label>
+						<input id="stationName" type="text" class="mui-input-clear" readonly="readonly">
+					</div>
+					<div class="mui-input-row">
+						<label>车牌号码：</label>
+						<select id="hList" name="hList" style="margin:auto; color:#666;width: 20%;float: left;display: none;">
+						</select>
+						<input style="margin:auto; width: 20%;float: left;" id="car_no" type="text" class="mui-input-clear" placeholder="请输入车牌号码">
+						<select id="fList" name="fList" class="mui-h5" style="margin:auto; color:#666;width: 20%;float: left;display: none;">
+						</select>
+					</div>
+					<!-- 气瓶检查 -->
+					<div class="mui-input-row">
+						<label style="color: red;font-style: italic;">气瓶检查：</label>
+						<div class="mui-switch" id="checkSwitch">
+							<div class="mui-switch-handle"></div>
+						</div>
+					</div>
+					<!-- 下拉选择氢气供应商 -->
+					<div class="mui-input-row">
+						<label>氢气供应商：</label>
+						<a class="mui-navigate-right">
+							<span class="mui-badge1">
+								<select id="name" name="name" class="mui-h5" style="margin:auto; color:#000;">
+								</select>
+							</span>
+						</a>
+					</div>
+					<!-- 开始加氢记录数据区域 -->
+					<div class="mui-input-row">
+						<label style="color: red;font-style: italic;">加氢前车辆参数信息：</label>
+						<div class="mui-switch" id="sSwitch">
+							<div class="mui-switch-handle"></div>
+						</div>
+					</div>
+					<div class="mui-input-row">
+						<label>预冷温度：</label>
+						<input id="pre_cooling_temperature" style="width: 50%; float: left; padding: 11px 0px;" type="number" />
+						<span class="text_unit">℃ <span id="read_temperature" type="button">读取</span></span>
+					</div>
+					<div class="mui-input-row">
+						<label>开始加氢：</label>
+						<input id="start_time" style="width: 50%; float: left; padding: 11px 0px;" />
+					</div>
+					<div class="mui-input-row">
+						<label>起始压力：</label>
+						<input id="start_pressure" style="width: 50%; float: left; padding: 11px 0px;" type="number" />
+						<span class="text_unit">Bar</span>
+					</div>
+					<div class="mui-input-row">
+						<label>起始温度：</label>
+						<input id="start_temperature" style="width: 50%; float: left; padding: 11px 0px;" type="number" />
+						<span class="text_unit">℃</span>
+					</div>
+					<!-- 结束加氢记录数据区域 -->
+					<div class="mui-input-row">
+						<label style="color: red;font-style: italic;">加氢后车辆参数信息：</label>
+						<div class="mui-switch mui-active" id="eSwitch">
+							<div class="mui-switch-handle"></div>
+						</div>
+					</div>
+					<div class="mui-input-row">
+						<label>结束加氢：</label>
+						<input id="end_time" style="width: 50%; float: left; padding: 11px 0px;" />
+					</div>
+					<div class="mui-input-row">
+						<label>结束压力：</label>
+						<input id="end_pressure" style="width: 50%; float: left; padding: 11px 0px;" type="number" />
+						<span class="text_unit">Bar</span>
+					</div>
+					<div class="mui-input-row">
+						<label>结束温度：</label>
+						<input id="end_temperature" style="width: 50%; float: left; padding: 11px 0px;" type="number" />
+						<span class="text_unit">℃</span>
+					</div>
+					<div class="mui-input-row">
+						<label>本次加氢耗时：</label>
+						<input id="spend_time" style="width: 50%; float: left; padding: 11px 0px;" />
+					</div>
+					<div class="mui-input-row">
+						<label>加注量：</label>
+						<input id="sum" style="width: 50%; float: left; padding: 11px 0px;" type="number" />
+						<span class="text_unit">kg</span>
+					</div>
+					<!-- 签名区域 -->
+					<div id="last_sig" class="mui-row" style="margin: 15px;">
+						<div class="mui-col-sm-6 mui-col-xs-6">
+							<label>上次加氢员签名：</label>
+							<img id="worker" class="e_img mui--z1" width="90%" src="images/sig.jpg" />
+						</div>
+						<div class="mui-col-sm-6 mui-col-xs-6">
+							<label>上次司机签名：</label>
+							<img id="driver" class="e_img mui--z1" width="90%" src="images/sig.jpg" />
+						</div>
+					</div>
+					<fieldset id="receiver_qm" class="mui-row" style="margin-top: 5px;border-box;border: 1px solid green;width: 99.3%;height: 220px;background:#fff;">
+						<legend>加氢员签名</legend>
+						<div id="receiver_signature" style="height: 95%;">
+						</div>
+					</fieldset>
+					<div class="mui-row" style="margin-top: 10px;">
+						<div class="mui-button-row">
+							<button id="sure_worker" type="button" class="mui-btn mui-btn-danger" style="border-radius: .25rem;" onclick="">确&nbsp;&nbsp;认&nbsp;&nbsp;签&nbsp;&nbsp;名</button>
+							<button id="reset_worker" type="button" class="mui-btn mui-btn-grey" style="border-radius: .25rem;" onclick="">重&nbsp;&nbsp;置&nbsp;&nbsp;签&nbsp;&nbsp;名</button>
+						</div>
+					</div>
+					<fieldset id="send_qm" class="mui-row" style="margin-top: 5px;border-box;border: 1px solid green;width: 99.3%;height: 220px;background:#fff;">
+						<legend>司机签名</legend>
+						<div id="send_signature" style="height: 95%;">
+						</div>
+					</fieldset>
+					<div class="mui-row" style="margin-top: 10px;">
+						<div class="mui-button-row">
+							<button id="sure_driver" type="button" class="mui-btn mui-btn-danger" style="border-radius: .25rem;" onclick="">确&nbsp;&nbsp;认&nbsp;&nbsp;签&nbsp;&nbsp;名</button>
+							<button id="reset_driver" type="button" class="mui-btn mui-btn-grey" style="border-radius: .25rem;" onclick="">重&nbsp;&nbsp;置&nbsp;&nbsp;签&nbsp;&nbsp;名</button>
+						</div>
+					</div>
+					<!-- 提交数据 -->
+					<div class="mui-button-row">
+						<button id="submit_btn" type="button" class="mui-btn mui-btn-primary mui-btn-block" style="padding: 5px 0;">结&nbsp;束&nbsp;任&nbsp;务</button>
+						<!-- <button id="cancel_btn" type="button" class="mui-btn mui-btn-danger" style="width: 30%; padding: 5px 0;">取消</button> -->
+					</div>
+				</form>
+			</div>
+		</div>
+		<script src="js/mui.js"></script>
+		<script src="https://cdn.bootcss.com/echarts/4.4.0-rc.1/echarts-en.common.js"></script>
+		<script src="js/jquery.min.js" type="text/javascript"></script>
+		<script src="js/flashcanvas.js"></script>
+		<script src="js/jSignature.js"></script>
+		<script>
+			mui.init();
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				var stationId = self.stationId;
+				var stationName = self.stationName;
+				var taskId = self.taskId;
+				var taskName = self.taskName;
+				var flag = self.flag;
+				var dataFlag = 0;
+				// 获取年月日
+				function getSomeDay(times) {
+					var myDate = new Date();
+					myDate.setTime(myDate.getTime() + times * 24 * 60 * 60 * 1000);
+					var year = myDate.getFullYear();
+					var month = myDate.getMonth() + 1;
+					var date = myDate.getDate();
+					var someDay = year + '-' + getCorrect(month) + "-" + getCorrect(date);
+					return someDay;
+				}
+				// 获取月日
+				function getMonthDay(times) {
+					var myDate = new Date();
+					myDate.setTime(myDate.getTime() + times * 24 * 60 * 60 * 1000);
+					var month = myDate.getMonth() + 1;
+					var date = myDate.getDate();
+					var monthDay = getCorrect(month) + "-" + getCorrect(date);
+					return monthDay;
+				}
+				// 判断时间
+				function getCorrect(number) {
+					return number < 10 ? '0' + number : number;
+				}
+				var read_temperature = document.getElementById("read_temperature");
+				read_temperature.addEventListener("tap", function() {
+					mui.ajax("http://101.36.151.185:9901/?station_id=" + stationId, {
+						type: 'get',
+						timeout: 10000,
+						success: function(result) {
+							for (let i = 0; i <= result.length - 1; i++) {
+								if (result[i].signalName == "加氢机氢气温度") {
+									$("#pre_cooling_temperature").val(result[i].value);
+									break;
+								}
+							}
+						},
+						error: function(xhr, type, errorThrown) {
+							mui.toast('读取异常', {
+								duration: 'short',
+								type: 'div'
+							});
+						}
+					});
+				})
+				var days = [];
+				for (let i = -6; i < 1; i++) {
+					let day = getSomeDay(i);
+					days.push(day);
+				}
+				// 基于准备好的dom，初始化echarts实例
+				var myChart = echarts.init(document.getElementById('echars'));
+				updateCount();
+
+				function updateCount() {
+					mui.ajax('http://www.hyfuncloud.cn/api/HydrogenationRecord/queryCountByUserId', {
+						data: {
+							stationId: stationId,
+							days: days,
+							userId: plus.storage.getItem('userId')
+						},
+						type: 'post',
+						timeout: 10000,
+						success: function(result) {
+							if (result.data) {
+								myChart.setOption({
+									title: {
+										text: '近一周加氢次数',
+										x: 'center',
+										y: '5px',
+										textStyle: {
+											fontSize: 12
+										}
+									},
+									tooltip: {},
+									grid: {
+										left: '5%',
+										right: '5%',
+										top: '30%',
+										bottom: '3%',
+										containLabel: true
+									},
+									xAxis: {
+										data: [getMonthDay(-6), getMonthDay(-5), getMonthDay(-4), getMonthDay(-3), getMonthDay(-2), '昨天', '今天']
+									},
+									yAxis: {
+										minInterval: 5
+									},
+									series: [{
+										name: '',
+										type: 'line',
+										label: {
+											normal: {
+												show: true,
+												position: 'top'
+											}
+										},
+										data: result.data,
+										smooth: true,
+										lineStyle: {
+											normal: {
+												color: "green"
+											}
+										}
+									}]
+								});
+							} else {
+								mui.toast(JSON.stringify(result.data), {
+									duration: 'short',
+									type: 'div'
+								});
+							}
+						},
+						error: function(xhr, type, errorThrown) {
+							mui.toast('错误', {
+								duration: 'short',
+								type: 'div'
+							});
+						}
+					});
+				}
+				// $("#start_pressure").bind("input propertychange", function(event) {
+				// 	var jtstartPressure = $("#start_pressure").val();
+				// 	if (jtstartPressure != '') {
+				// 		$('#sSwitch').removeClass("mui-disabled");
+				// 	} else {
+				// 		$('#sSwitch').addClass("mui-disabled");
+				// 	}
+				// });
+				$("#start_time").bind("input propertychange", function(event) {
+					var jtstartTime = $("#start_time").val();
+					if (jtstartTime != '') {
+						$('#eSwitch').removeClass("mui-disabled");
+					} else {
+						$('#eSwitch').addClass("mui-disabled");
+					}
+				});
+				var ajaxUrl = 'http://www.hyfuncloud.cn/api/HydrogenationRecord/add';
+				mui.back = function() {
+					if ($("#submit_btn").prop("disabled")) {
+						var page = plus.webview.currentWebview().opener();
+						mui.fire(page, 'reflash', {});
+						mui.currentWebview.close();
+					} else {
+						mui.confirm('您还没提交，是否提交？', ' ', ['终止提交', '继续操作'], function(e) {
+							if (e.index == 0) {
+								var page = plus.webview.currentWebview().opener();
+								mui.fire(page, 'reflash', {});
+								mui.currentWebview.close();
+							}
+						}, 'div')
+					}
+				}
+				$('#stationName').prop("disabled", true);
+				$("#stationName").val(stationName);
+				var receiver_imageBase64 = '';
+				var send_imageBase64 = '';
+				var slists = JSON.parse(plus.storage.getItem("slists"));
+				if (slists) {
+					for (let i = 0; i < slists.length; i++) {
+						$("#name").append("<option value='" + slists[i] + "'>" + slists[i] + "</option>");
+					}
+				}
+				getAjaxUrl();
+
+				function getAjaxUrl() {
+					if (flag == 1) {
+						var timestamp = new Date().getTime();
+						var jqNumber = document.getElementById("number");
+						jqNumber.value = 'JQ' + timestamp;
+						$("#last_sig").css("display", "none");
+						$("#hList").css("display", "block");
+						$("#fList").css("display", "block");
+						var hlists = JSON.parse(plus.storage.getItem("hlists"));
+						var flists = JSON.parse(plus.storage.getItem("flists"));
+						// $('#sSwitch').addClass("mui-disabled");
+						$('#eSwitch').addClass("mui-disabled");
+						if (hlists) {
+							for (let i = 0; i < hlists.length; i++) {
+								$("#hList").append("<option value='" + hlists[i] + "'>" + hlists[i] + "</option>");
+							}
+						}
+						if (flists) {
+							for (let i = 0; i < flists.length; i++) {
+								$("#fList").append("<option value='" + flists[i] + "'>" + flists[i] + "</option>");
+							}
+						}
+					} else {
+						$("#last_sig").css("display", "block");
+						ajaxUrl = 'http://www.hyfuncloud.cn/api/HydrogenationRecord/update';
+						ajaxData = {
+							taskId: taskId
+						};
+						mui.ajax('http://www.hyfuncloud.cn/api/HydrogenationRecord/queryContentBytaskId', {
+							data: ajaxData,
+							type: 'post',
+							timeout: 10000,
+							success: function(result) {
+								if (result.data) {
+									// 设置上次提交的数据
+									var hydrogeneratorSignatureImg = '';
+									var driverSignatureImg = '';
+									if (result.data[0].hydrogeneratorSignature != null) {
+										hydrogeneratorSignatureImg = "http://www.hyfuncloud.cn" + result.data[0].hydrogeneratorSignature;
+										$('#worker').attr({
+											src: hydrogeneratorSignatureImg
+										});
+									}
+
+									if (result.data[0].driverSignature != null) {
+										driverSignatureImg = "http://www.hyfuncloud.cn" + result.data[0].driverSignature;
+										$('#driver').attr({
+											src: driverSignatureImg
+										});
+									}
+
+									$("#number").val(result.data[0].number);
+									// 氢气供应商名称
+									if (result.data[0].name != '') {
+										$("#name").val(result.data[0].name);
+										$('#name').prop("disabled", true);
+									} else {
+										$("#name").val('');
+									}
+									// 车牌号码
+									if (result.data[0].carNo != '') {
+										$("#car_no").val(result.data[0].carNo);
+										$('#car_no').prop("disabled", true);
+									} else {
+										$("#car_no").val('');
+									}
+									// 预冷温度
+									if (result.data[0].preCoolingTemperature == 0.00) {
+										$("#pre_cooling_temperature").val('');
+									} else {
+										$("#pre_cooling_temperature").val(result.data[0].preCoolingTemperature);
+									}
+									// 开始加氢
+									if (result.data[0].beginTime == '0000-00-00 00:00:00') {
+										$("#start_time").val('');
+										$('#eSwitch').addClass("mui-disabled");
+									} else {
+										$("#start_time").val(result.data[0].beginTime);
+										$('#eSwitch').removeClass("mui-disabled");
+									}
+									
+									// 开始温度
+									if (result.data[0].startingTemperature == 0.00) {
+										$("#start_temperature").val('');
+									} else {
+										$("#start_temperature").val(result.data[0].startingTemperature);
+									}
+									// 开始压力
+									if (result.data[0].startingPressure == 0.00) {
+										$("#start_pressure").val('');
+										$('#sSwitch').addClass("mui-disabled");
+									} else {
+										$("#start_pressure").val(result.data[0].startingPressure);
+										$('#sSwitch').removeClass("mui-disabled");
+									}
+									// 结束温度
+									if (result.data[0].endTemperature == 0.00) {
+										$("#end_temperature").val('');
+									} else {
+										$("#end_temperature").val(result.data[0].endTemperature);
+									}
+									// 结束压力
+									if (result.data[0].endPressure == 0.00) {
+										$("#end_pressure").val('');
+									} else {
+										$("#end_pressure").val(result.data[0].endPressure);
+									}
+									
+									// 加注量
+									if (result.data[0].totalHydrogen == 0.00) {
+										$("#sum").val('');
+									} else {
+										$("#sum").val(result.data[0].totalHydrogen);
+									}
+									// 结束加氢
+									if (result.data[0].endTime == '0000-00-00 00:00:00') {
+										$("#end_time").val('');
+									} else {
+										$("#end_time").val(result.data[0].endTime);
+									}
+									// 加氢时长
+									$("#spend_time").val(result.data[0].spendTime);
+								} else {
+									mui.toast(JSON.stringify(result.data), {
+										duration: 'short',
+										type: 'div'
+									});
+								}
+							},
+							error: function(xhr, type, errorThrown) {
+								mui.toast('错误', {
+									duration: 'short',
+									type: 'div'
+								});
+							}
+						});
+					}
+				}
+
+				function getCurrentTime() {
+					var myDate = new Date();
+					//获取当前年
+					var year = myDate.getFullYear();
+					//获取当前月
+					var month = myDate.getMonth() + 1;
+					//获取当前日
+					var date = myDate.getDate();
+					var h = myDate.getHours(); //获取当前小时数(0-23)
+					var m = myDate.getMinutes(); //获取当前分钟数(0-59)
+					var s = myDate.getSeconds();
+					var now = year + '-' + getCorrect(month) + "-" + getCorrect(date) + " " + getCorrect(h) + ':' + getCorrect(m) +
+						":" + getCorrect(s);
+					return now;
+				}
+				// 获取当前时间
+				function getCorrect(number) {
+					return number < 10 ? '0' + number : number;
+				}
+
+				function getSE() {
+					var stime = $("#start_time").val();
+					var etime = $("#end_time").val();
+					getDiffer(stime, etime);
+				}
+				// 计算时间差
+				function getDiffer(start, end) {
+					var d1 = new Date(start);
+					var d2 = new Date(end);
+					var reshours = parseInt((d2 - d1) / 1000 / 60 / 60);
+					var resminutes = parseInt((d2 - d1) / 1000 / 60);
+					var resseconds = parseInt((d2 - d1) / 1000);
+					var jqtime = '';
+					if ((resseconds - resminutes * 60) >= 30) {
+						jqtime = getCorrect(resminutes - reshours * 60 + 1) + '分钟';
+					} else {
+						jqtime = getCorrect(resminutes - reshours * 60) + '分钟';
+					}
+					$('#spend_time').val(jqtime);
+				}
+				var sava = document.getElementById("submit_btn");
+				sava.addEventListener("tap", function() {
+					var jtsum = $("#sum").val();
+					if (jtsum == '') {
+						mui.alert('加注量不能为空', '温馨提示', '确定', function(e) {
+							return;
+						}, 'div')
+					} else {
+						mui.confirm('确定结束本次任务？一旦锁定，本次提交之后将再无法更改', '警告', ['取消', '确认'], function(e) {
+							if (e.index == 1) {
+								dataFlag = 1;
+								submitData();
+							}
+						}, 'div')
+					}
+				})
+				document.getElementById("sSwitch").addEventListener("toggle", function(event) {
+					if (event.detail.isActive) {
+						$('#start_time').val(getCurrentTime());
+						$('#sSwitch').addClass("mui-disabled");
+						$('#eSwitch').removeClass("mui-disabled");
+					}
+				})
+				document.getElementById("eSwitch").addEventListener("toggle", function(event) {
+					if (!event.detail.isActive) {
+						$('#end_time').val(getCurrentTime());
+						getSE();
+						$('#eSwitch').addClass("mui-disabled");
+						mui.ajax("http://101.36.151.185:9901/?station_id=" + stationId, {
+							type: 'get',
+							timeout: 10000,
+							success: function(result) {
+								for (let i = 0; i <= result.length - 1; i++) {
+									if (result[i].signalName == "加氢机加注实时质量") {
+										$("#sum").val(result[i].value);
+										break;
+									}
+								}
+							},
+							error: function(xhr, type, errorThrown) {
+								mui.toast('读取异常', {
+									duration: 'short',
+									type: 'div'
+								});
+							}
+						});
+					}
+				})
+				// 加氢员签名
+				var sure_worker = document.getElementById("sure_worker");
+				document.getElementById("sure_worker").addEventListener('tap', function() {
+					//将画布内容转换为图片
+					var receiver_datapair = $("#receiver_signature").jSignature("getData", "image");
+					var receiver_image = new Image();
+					receiver_image.src = "data:" + receiver_datapair[0] + "," + receiver_datapair[1];
+					receiver_imageBase64 = receiver_image.src;
+					mui.toast('加氢员签名已保存', {
+						duration: 'short',
+						type: 'div'
+					});
+					$("#receiver_qm").hide("slow");
+					sure_worker.setAttribute("disabled", true);
+				})
+				document.getElementById("reset_worker").addEventListener('tap', function() {
+					$("#receiver_signature").jSignature("reset");
+					$("#receiver_qm").show("slow");
+					sure_worker.removeAttribute("disabled");
+				})
+				$(function() {
+					$("#receiver_signature").jSignature();
+				})
+				// 司机签名
+				var sure_driver = document.getElementById("sure_driver");
+				document.getElementById("sure_driver").addEventListener('tap', function() {
+					//将画布内容转换为图片
+					var send_datapair = $("#send_signature").jSignature("getData", "image");
+					var send_image = new Image();
+					send_image.src = "data:" + send_datapair[0] + "," + send_datapair[1];
+					send_imageBase64 = send_image.src;
+					mui.toast('司机签名已保存', {
+						duration: 'short',
+						type: 'div'
+					});
+					$("#send_qm").hide("slow");
+					sure_driver.setAttribute("disabled", true);
+				})
+				document.getElementById("reset_driver").addEventListener('tap', function() {
+					$("#send_signature").jSignature("reset");
+					$("#send_qm").show("slow");
+					sure_driver.removeAttribute("disabled");
+				})
+				$(function() {
+					$("#send_signature").jSignature();
+				})
+				// 滑动触发input失去焦点
+				document.querySelector('.mui-content').addEventListener('swipe', function() {
+					var input = document.getElementsByTagName("input");
+					for (let i = 0; i < input.length; i++) {
+						input[i].blur();
+					}
+				})
+				var submit_btn = document.getElementById("saveData");
+				submit_btn.addEventListener('tap', function() {
+					if (receiver_imageBase64 == '' || send_imageBase64 == '') {
+						mui.confirm('有未签名或签名未保存，确认提交？', '温馨提示', ['终止提交', '继续操作'], function(e) {
+							if (e.index == 0) {
+								return;
+							} else {
+								submitData();
+							}
+						}, 'div')
+						return;
+					} else {
+						submitData();
+					}
+				});
+				
+				document.getElementById("checkSwitch").classList.contains('mui-active') == true;
+
+				function submitData() {
+					var check = document.getElementById("checkSwitch").classList.contains('mui-active');
+					if(check == true) {
+						$("#saveData").hide("fast");
+						var data = '';
+						var pre_cooling_temperature = $("#pre_cooling_temperature").val();
+						var start_time = $("#start_time").val();
+						
+						var start_temperature = $("#start_temperature").val();
+						var start_pressure = $("#start_pressure").val();
+						var end_pressure = $("#end_pressure").val();
+						var end_temperature = $("#end_temperature").val();
+						
+						var end_time = $("#end_time").val();
+						var spend_time = $("#spend_time").val();
+						var sum = $("#sum").val();
+						if (flag == 1) {
+							var userId = plus.storage.getItem('userId');
+							var number = $("#number").val();
+							var name = $('#name option:selected').val();
+							var car_no = $('#hList option:selected').val() + $("#car_no ").val() + $('#fList option:selected').val();
+							data = {
+								user_id: userId,
+								number: number,
+								name: name,
+								car_no: car_no,
+								station_id: stationId,
+								pre_cooling_temperature: pre_cooling_temperature,
+								start_time: start_time,
+								start_temperature: start_temperature,
+								start_pressure: start_pressure,
+								end_pressure: end_pressure,
+								end_temperature: end_temperature,
+								end_time: end_time,
+								spend_time: spend_time,
+								total_hydrogen: sum,
+								hydrogenerator_signature: receiver_imageBase64,
+								deliveryman_signature: send_imageBase64,
+								data_flag: dataFlag
+							};
+						} else {
+							data = {
+								taskId: taskId,
+								pre_cooling_temperature: pre_cooling_temperature,
+								start_time: start_time,
+								start_temperature: start_temperature,
+								start_pressure: start_pressure,
+								end_pressure: end_pressure,
+								end_temperature: end_temperature,
+								end_time: end_time,
+								spend_time: spend_time,
+								total_hydrogen: sum,
+								hydrogenerator_signature: receiver_imageBase64,
+								deliveryman_signature: send_imageBase64,
+								data_flag: dataFlag
+							};
+						}
+						mui.ajax(ajaxUrl, {
+							data: data,
+							type: 'post',
+							timeout: 10000,
+							success: function(result) {
+								if (result.data) {
+									sava.setAttribute("disabled", true);
+									mui.toast(JSON.stringify(result.data), {
+										duration: 'short',
+										type: 'div'
+									});
+									updateCount();
+								} else {
+									mui.toast(JSON.stringify(result.data), {
+										duration: 'short',
+										type: 'div'
+									});
+								}
+							},
+							error: function(xhr, type, errorThrown) {
+								mui.toast('错误', {
+									duration: 'short',
+									type: 'div'
+								});
+							}
+						});
+					}else{
+						mui.alert('气瓶状态不合法，不允许提交','警告','确定',function (e) {
+						   e.index
+						},'div')
+					}
+				}
+			})
+		</script>
+	</body>
+
+</html>

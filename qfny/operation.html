@@ -1,0 +1,217 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+		<style type="text/css">
+			.mui-bar-nav {
+				background-color: #04B1E9;
+			}
+
+			.mui-bar-nav a,
+			.mui-bar-nav h1 {
+				color: #fff;
+			}
+
+			#slider {
+				margin-top: 45px;
+			}
+
+			.subTitle {
+				font-size: 1rem;
+				width: 100%;
+				text-align: center;
+				color: #04B1E9;
+				margin-bottom: 5px;
+				padding: 1rem;
+			}
+
+			.subContent {
+				width: 100%;
+				margin: 10px auto;
+			}
+
+			.subContent div {
+				width: 90%;
+				margin: 0 auto !important;
+				padding: 10px auto;
+				color: #262626;
+				font-size: 0.9rem;
+			}
+
+			.d_img {
+				width: 100%;
+				text-align: center;
+				background-color: #fff;
+			}
+
+			.d_img img {
+				height: 200px;
+				width: auto !important;
+				border: 1px solid #04B1E9;
+				border-radius: 0.2rem;
+				margin: 10px auto 2px;
+				padding: 2px;
+			}
+
+			.mui-scroll-wrapper {
+				margin-top: 300px;
+			}
+
+			.mui--z1 {
+				box-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24)
+			}
+
+			.mui--z2 {
+				box-shadow: 0 3px 6px rgba(0, 0, 0, .16), 0 3px 6px rgba(0, 0, 0, .23)
+			}
+
+			.mui--z3 {
+				box-shadow: 0 10px 20px rgba(0, 0, 0, .19), 0 6px 6px rgba(0, 0, 0, .23)
+			}
+
+			.mui--z4 {
+				box-shadow: 0 14px 28px rgba(0, 0, 0, .25), 0 10px 10px rgba(0, 0, 0, .22)
+			}
+
+			.mui--z5 {
+				box-shadow: 0 19px 38px rgba(0, 0, 0, .3), 0 15px 12px rgba(0, 0, 0, .22);
+			}
+
+			/*toast信息提示*/
+			.mui-toast-container {
+				bottom: 50% !important;
+			}
+
+			.mui-toast-message {
+				font-size: 1.5rem;
+				opacity: 0.6;
+				color: #fff;
+				width: auto;
+				padding: 20px 20px;
+			}
+			.max{
+				width: 100%;
+				height: auto;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 id="title" class="mui-title"></h1>
+		</div>
+		<div id="slider" class="mui-slider mui-fullscreen">
+			<div class="mui-slider-group" id="List"></div>
+		</div>
+		<!-- 系统 -->
+		<script src="js/mui.js"></script>
+		<script src="js/jquery.min.js" type="text/javascript"></script>
+		<script>
+			mui.init();
+			mui.plusReady(function() {
+				var self = plus.webview.currentWebview();
+				var workId = self.workId;
+				var stationId = self.stationId;
+				var typeId = self.typeId;
+				mui.back = function() {
+					if ($("#submit").prop("disabled")) {
+						mui.currentWebview.close();
+					} else {
+						mui.confirm('您还没提交，确定离开此页面？', ' ', ['取消', '确认'], function(e) {
+							if (e.index == 1) {
+								mui.currentWebview.close();
+							}
+						}, 'div')
+					}
+				}
+				mui.ajax('http://www.hyfuncloud.cn/api/work/queryContentById', {
+					data: {
+						workid: workId,
+					},
+					dataType: 'json', //服务器返回json格式数据
+					type: 'post', //HTTP请求类型
+					timeout: 10000, //超时时间设置为10秒；
+					success: function(result) {
+						if (result.data != '') {
+							var str = '';
+							var subStr = '';
+							for (var i = 0; i <= result.data[0]['content'].length; i++) {
+								subStr = '';
+								if (i != result.data[0]['content'].length) {
+									if (result.data[0]['content'][i].pic != '') {
+										subStr = '<div class="d_img"><img src="http://www.hyfuncloud.cn' + result.data[0]['content'][i].pic +
+											'" /></div>';
+									}
+									str += '<div class="mui-slider-item guide-show" id="' + i + '">' +
+										'<div class="subTitle">' + result.data[0]['content'][i]['title'] + '</div>' +
+										subStr +
+										'<div class="mui-scroll-wrapper subContent">' +
+										'<div>' + result.data[0]['content'][i]['content'] +
+										'</div>' +
+										'</div>' +
+										'</div>';
+								} else {
+									str += '<div class="mui-slider-item guide-show" id="' + i + '">' +
+										'<div class="mui-text-center submit" style="padding-top:200px;"><button name="submit" type="submit" class="mui-btn mui-btn-lg mui-btn-primary mui--z1" id="submit">完成作业</div>' +
+										'<h3 class="mui-text-center" style="margin-top: 200px;color: red;" id="submit_result"></h3>' +
+										'</div>';
+								}
+							}
+							$('#title').html(result.data[0]['title']);
+							$('#List').html(str);
+
+							mui('.mui-slider').slider({});
+							mui('.mui-scroll-wrapper').scroll({
+								indicators: false,
+							});
+						}
+					},
+					error: function(xhr) {
+						mui.toast('网络请求出现错误', {
+							duration: 'short',
+							type: 'div'
+						});
+					}
+				})
+
+				mui('#List').on('tap', '.mui-slider-item .submit #submit ', function(event) {
+					var name = $("#title").html();
+					var data = {
+						user_id: plus.storage.getItem('userId'),
+						station_id: stationId,
+						type_id: typeId,
+						name: name
+					}
+					mui.ajax('http://www.hyfuncloud.cn/api/work/addWorkRecord', {
+						data: data,
+						dataType: 'json', //服务器返回json格式数据
+						type: 'post', //HTTP请求类型
+						timeout: 10000, //超时时间设置为10秒；
+						success: function(result) {
+							if (result.data == "提交成功") {
+								document.getElementById("submit").setAttribute("disabled", true);
+								document.getElementById("submit_result").innerHTML = result.data;
+							} else {
+								mui.toast(result.data, {
+									duration: 'short',
+									type: 'div'
+								});
+							}
+						},
+						error: function(xhr, type, errorThrown) {
+							mui.toast('错误', {
+								duration: 'short',
+								type: 'div'
+							});
+						}
+					});
+				});
+			});
+		</script>
+	</body>
+</html>

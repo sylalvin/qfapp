@@ -1,0 +1,139 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+		<style type="text/css">
+			* {
+				font-family: "microsoft yahei" !important;
+			}
+
+			.mui-btn-block {
+				padding: 0.5rem 0;
+			}
+
+			/*toast信息提示*/
+			.mui-toast-container {
+				bottom: 50% !important;
+			}
+
+			.mui-toast-message {
+				font-size: 1.5rem;
+				opacity: 0.6;
+				color: #fff;
+				width: auto;
+				padding: 20px 20px;
+			}
+		</style>
+	</head>
+	<body style="background-color: #fff;">
+		<div class="mui-row mui-text-center" style="padding-top: 4rem;">
+			<img src="images/logo.png">
+		</div>
+
+		<div class="mui-row" style="margin: 4rem 1rem 0;border-bottom: #04B1E9 solid 2px;background-color: #fff;">
+			<div class="mui-input-row">
+				<label>账户</label>
+				<input id="username" type="tel" class="mui-input-clear" placeholder="输入手机号" name="" />
+			</div>
+		</div>
+		<div class="mui-row" style="margin: 1rem 1rem 0;border-bottom: #04B1E9 solid 2px;background-color: #fff;">
+			<div class="mui-input-row">
+				<label>密码</label>
+				<input id="pwd" type="password" class="mui-input-clear" placeholder="输入密码" name="" />
+			</div>
+		</div>
+		<div class="mui-row" style="margin: 4rem 1rem 0;background-color: #fff;">
+			<button id="login" type="button" class="mui-btn mui-btn-blue mui-btn-block">登&nbsp;&nbsp;&nbsp;&nbsp;录</button>
+		</div>
+		<script src="js/mui.js"></script>
+		<script type="text/javascript">
+			mui.init();
+			mui.plusReady(function() {
+				if (plus.storage.getItem('phone') != '') {
+					document.getElementById("username").value = plus.storage.getItem('phone');
+				}
+				if (plus.storage.getItem('password') != '') {
+					document.getElementById("pwd").value = plus.storage.getItem('password');
+				}
+				var login = document.getElementById("login");
+				login.addEventListener('tap', function() {
+					var username = document.getElementById("username").value;
+					var password = document.getElementById("pwd").value;
+					if (username == '' || password == '') {
+						mui.toast('用户名或密码不能为空', {
+							duration: 'short',
+							type: 'div'
+						});
+						return;
+					} else {
+						var data = {
+							username: username,
+							password: password
+						}
+						mui.ajax('http://www.hyfuncloud.cn/api/user/login', {
+							data: data,
+							dataType: 'json',
+							type: 'post',
+							timeout: 10000,
+							success: function(result) {
+								if (result.data == '') {
+									mui.toast('用户名或密码不正确', {
+										duration: 'short',
+										type: 'div'
+									});
+									return;
+								} else {
+									// console.log(JSON.stringify(result.data[0]));
+									plus.storage.setItem('username', result.data[0].name);
+									plus.storage.setItem('password', password);
+									plus.storage.setItem('email', result.data[0].email);
+									plus.storage.setItem('phone', result.data[0].phone);
+									plus.storage.setItem('address', result.data[0].address);
+									plus.storage.setItem('summary', result.data[0].summary);
+									plus.storage.setItem('station_id', result.data[0].stationId);
+									plus.storage.setItem('userId', result.data[0].userId);
+									plus.storage.setItem('createdAt', result.data[0].createdAt);
+									mui.openWindow({
+										url: 'index.html',
+										id: 'index.html'
+									});
+								}
+							},
+							error: function(xhr) {
+								mui.toast('请检查用户名和密码', {
+									duration: 'short',
+									type: 'div'
+								});
+							}
+						});
+					}
+				})
+			})
+			var first = null;
+			mui.back = function() {
+				mui.plusReady(function() {
+					//首页返回键处理
+					//处理逻辑：1秒内，连续两次按返回键，则退出应用；
+					if (!first) {
+						first = new Date().getTime();
+						mui.toast('再按一次退出应用', {
+							duration: 'short',
+							type: 'div'
+						});
+						setTimeout(function() {
+							first = null;
+						}, 1000);
+					} else {
+						if (new Date().getTime() - first < 1000) {
+							plus.runtime.quit();
+						}
+					}
+				});
+			}
+		</script>
+	</body>
+</html>
