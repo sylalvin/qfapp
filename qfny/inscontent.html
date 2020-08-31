@@ -326,7 +326,8 @@
 									currentTime = current_time.replace(/:/, "");
 									slotTime = timeSlot[0].replace(/:/, "");
 									// console.log(currentTime-slotTime);
-									if(Number(currentTime) < Number(slotTime)) {
+									// if(Number(currentTime) < Number(slotTime)) {
+									if(false) {
 										submit_btn.setAttribute("disabled", true);
 										mui.alert('时间未到，不能提交', ' ', '知道了', function(e) {}, 'div');
 									} else {
@@ -351,6 +352,8 @@
 										var inspect_result = $('input[name="checkbox"]:checked').val();
 										formData.append("inspect_id", inspect_id);
 										formData.append("content", content);
+										console.log(date);
+										// return;
 										formData.append("current_date", date);
 										formData.append("current_time", time_slot);
 										formData.append("result", inspect_result);
@@ -365,6 +368,7 @@
 											contentType: false,
 											timeout: 10000,
 											success: function(result) {
+												console.log(result.data);
 												if (result.data == "1") {
 													submit_btn.setAttribute("disabled", true);
 													mui.toast('提交成功', {
